@@ -41,23 +41,32 @@ export default class PlayOff{
     //(ej: del array 0 de tablaOctavos al array 0 de cuarto) para que puedan volver a enfrentarse usando el mismo método
     createMatches(tabla){
         tabla.forEach(group=>{
+            let i=0
+            let arrayNumberInCurrentTable=0
             for(let team=0; team<group.length; team=team+2){
                 let nextTeam=parseInt(i)+parseInt(1)
-                this.playMatch(group[team], group(nextTeam))
+                if(i==0 || i%2==0){
+                    arrayNumberInCurrentTable=0
+                }else{
+                    arrayNumberInCurrentTable=0
+                }
+                this.playMatch(group[team], group(nextTeam), arrayNumberInCurrentTable)
             }
         })
  
     }
 
-    playMatch(teamA, teamB){
+    playMatch(teamA, teamB, arrayNumberInTable){
         const homeGoals=generateGoals()
         const awayGoals= generateGoals()
         if(homeGoals==awayGoals){
             this.playMatch(teamA, teamB)
         }else if(homeGoals > awayGoals){
-            
+            this.tablaCuartos[arrayNumberInTable].push(teamA)
+        }else if(homeGoals < awayGoals){
+            this.tablaCuartos[arrayNumberInTable].push(teamA)
         }
-        return [homeGoals, awayGoals]
+        
  
     }
 
