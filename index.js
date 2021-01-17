@@ -4,6 +4,7 @@
 import { teamList} from './teams.js' 
 import {shuffle} from './utils.js'
 import Classification from './classes/Classification.js'
+import PlayOff from './classes/PlayOff.js'
 
 
 const teams=pickTeams(teamList,64)
@@ -103,7 +104,9 @@ const printGroupsInfo = function(){
         }        
     }
 }
-
+//TODO: empieza mundial
+//Quita position de las tablas y explica el asunto
+//Limpia un poco esta pocilga
 const startClassification = function(){
     //Cada tabla de grupo tiene 3 rondas/arrays
     for (let e=0; e<3; e++){
@@ -114,10 +117,10 @@ const startClassification = function(){
             console.log(`Grupo ${groupsNames[i]} - Jornada ${roundNumber}`)
             console.log('-------------------')
             //Además de recorrer tablesOfGroups, recorremos a la vez tablesOfResults, que 
-            //tiene la misma estructura  pero guarda los goles de cada equipo en lugar de los objetos/equipos
+            //tiene la misma estructura  pero guarda los goles de cada equipo en lugar de los propios objetos/equipos
             //Cada elemento de tablesOfGroups/tablesOfResults es una tabla de grupo que contiene 3 rondas
             //Este bucle recorre los 2 partidos de la ronda e de la tabla de grupos i y de la tabla de resultados i
-            //En cada iteración tomamos los 2 equipos que se enfrentan para imprimirlos juntos
+            //En cada iteración, tomamos los 2 equipos que se enfrentan para imprimirlos juntos
             for(let j in tablesOfGroups[i][e]){
                 const hometeam = tablesOfGroups[i][e][j][0].name
                 const awayTeam = tablesOfGroups[i][e][j][1].name  
@@ -138,6 +141,7 @@ const startClassification = function(){
 
 }
 
-//printGroupsInfo()
+printGroupsInfo()
 startClassification()
-//classificationStage.print()
+
+const playOffsStage =new PlayOff (classificationStage.summaries[2]);

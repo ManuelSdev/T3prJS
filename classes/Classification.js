@@ -3,7 +3,7 @@ import {generateGoals} from '../utils.js'
 export const LOCAL_TEAM=0;
 export const AWAY_TEAM=1;
 export default class Classification{
-    constructor(teams=[],){
+    constructor(teams=[]){
         this.teams=teams
         
         this.teamsGroups=this.setTeamsGroups(teams)
@@ -52,10 +52,35 @@ export default class Classification{
 
 
 
-    //Método que aplica el algoritmo todos vs todos
-    //
+    //Método que aplica el algoritmo todos vs todos para rellenar las rondas
+    addTeamsGroupToStructure(table, teamsGroup){
+        let localTeam=0     //Contador que aumenta 
+        const indexOfLastTeam = teamsGroup.length-1
+        let awayTeam= indexOfLastTeam-1
+        table.forEach(round => {
+            for(let i=0; i<round.length; i++){
+                if(i==0){
+                    round[i]=[teamsGroup[localTeam],teamsGroup[indexOfLastTeam]]
+                    if(localTeam<indexOfLastTeam-1){
+                        localTeam++
+                    }else{
+                        localTeam=0
+                    }
+                }else{    
+                    round[i]=[teamsGroup[localTeam],teamsGroup[awayTeam]]
+                    awayTeam--
+                    if(localTeam<indexOfLastTeam-1){
+                        localTeam++
+                    }else{
+                        localTeam=0
+                    }
+                }
+            } 
+        })
+            return table
+    }
 
-
+    /*
     addTeamsGroupToStructure1(table, teamsGroup){
         let localTeam=0     //Contador que aumenta 
         const indexOfLastTeam = teamsGroup.length-1
@@ -109,34 +134,8 @@ export default class Classification{
         })
             return table
     }
-
+    */
     
-    addTeamsGroupToStructure(table, teamsGroup){
-        let localTeam=0     //Contador que aumenta 
-        const indexOfLastTeam = teamsGroup.length-1
-        let awayTeam= indexOfLastTeam-1
-        table.forEach(round => {
-            for(let i=0; i<round.length; i++){
-                if(i==0){
-                    round[i]=[teamsGroup[localTeam],teamsGroup[indexOfLastTeam]]
-                    if(localTeam<indexOfLastTeam-1){
-                        localTeam++
-                    }else{
-                        localTeam=0
-                    }
-                }else{    
-                    round[i]=[teamsGroup[localTeam],teamsGroup[awayTeam]]
-                    awayTeam--
-                    if(localTeam<indexOfLastTeam-1){
-                        localTeam++
-                    }else{
-                        localTeam=0
-                    }
-                }
-            } 
-        })
-            return table
-    }
 
     createTableOfMatchesPerGroup(anyGroup){
         const tableStructure = this.createTableStructure(anyGroup)
@@ -157,8 +156,8 @@ export default class Classification{
   
     start(){
         this.createTablesOfGroups(this.teamsGroups)
-        //Este método será llamado desde index.js para controlar 
         this.launchRounds()
+
     }
     //Método que accede al último array (match) que contiene los nombres de los equipos que se enfrentan
     //Llama al método playMatch() pasando un match como parámetro en cada iteración final
@@ -196,16 +195,6 @@ export default class Classification{
                 this.teamsGroups[i].forEach(team =>{
                     let stateOfOneTeam={}
                     stateOfOneTeam=Object.assign(stateOfOneTeam, team)
-                    /*
-                    stateOfOneTeam.name=team.name
-                    stateOfOneTeam.points=team.points
-                    stateOfOneTeam.matchesWon=team.matchesWon
-                    stateOfOneTeam.matchesDrawn=team.matchesDrawn
-                    stateOfOneTeam.matchesLost=team.matchesLost
-                    stateOfOneTeam.goalsScored=team.goalsScored
-                    stateOfOneTeam.goalsConceded=team.goalsConceded
-                    stateOfOneTeam.position=team.position
-                    */
                     //Añadimos propiedad goalsDiff
                     stateOfOneTeam.goalsDiff=team.goalsDiff
                     oneTeamGroupStateAtRound.push(stateOfOneTeam)
@@ -233,6 +222,8 @@ export default class Classification{
         return [homeGoals, awayGoals]
  
     }
+
+
     updateTeamStatistics(team, opponent, goalsScored, goalsConceded){
         team.goalsScored+=goalsScored
         team.goalsConceded+=goalsConceded
@@ -270,6 +261,8 @@ export default class Classification{
         }
         //console.log(team)
     }
+
+
     updatePositionsGroup(group){
         group.forEach(team=>{
             this.updatePositionsTeam(team)
@@ -284,18 +277,14 @@ export default class Classification{
     }
 
     checkEntries(teamA, teamB){
-        console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-        console.log('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         
         Object.entries(teamA).forEach(entries=>{
            // console.log( teamB)
             if(entries[0]==teamB.name && entries[1]==1){
-                console.log('CASO 1++++++++++++++++++++++++++++++++++++++++++++++++',entries[0], teamB.name)
                 teamA.position=3
                 teamB.position=2
                 
             }else if(entries[0]==teamB.name && entries[1]==2){
-                console.log('CASO 2++++++++++++++++++++++++++++++++++++++++++++++++',entries[0], teamB.name)
                 teamA.position=2
                 teamB.position=3
             }else if(entries[0]==teamB.name && entries[1]==0){
@@ -402,6 +391,14 @@ export default class Classification{
         return locatedTeam
     }
     
+    //Este metodo recorre la tercera ronda/array de summaries, donde están las tablas de grupo que
+    // almacenan a los equipos/objetos que tienen en sus propiedades los resultados finales.
+    //Cada array de la tercera ronda contiene un array con los equipos de un grupo
+    //El orden de los arrays se corresponde al extracto de alfabeto que nombra con letras a los grupos
+    //Se 
+    arrangeClasificatedTeamsInTwoGroups(){
+
+    }
     print(){
        // console.log(this.roundsOfMatches)
        console.log(this.tableOfMatches)
