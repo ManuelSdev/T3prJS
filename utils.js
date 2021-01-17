@@ -11,3 +11,8 @@ export const shuffle= function(array){
 	}
 	return array;
 }
+
+//Método que genera goles aleatorios
+export const generateGoals = function(){
+    return Math.round(Math.random() * 10);
+}
