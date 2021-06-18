@@ -13,8 +13,6 @@ export default class PlayOff {
         this.partidoBronce = []
         this.crearPrimeraTablaEliminatoria()
         this.resolverTablaEliminatoria(this.tablasEliminatorias[0])
-
-        //this.createMatches(this.tablaOctavos)
     }
 
     getTablas() {
@@ -38,29 +36,26 @@ export default class PlayOff {
     crearPrimeraTablaEliminatoria() {
         const primeraTabla = [[], []];
         for (let i = 0; i < this.teamsGroups.length; i++) {
-
             if (i == 0 || i % 2 == 0) {
                 primeraTabla[0].push(this.teamsGroups[i][0].name)
                 primeraTabla[1].push(this.teamsGroups[i][1].name)
             } else {
-
                 primeraTabla[0].push(this.teamsGroups[i][1].name)
                 primeraTabla[1].push(this.teamsGroups[i][0].name)
             }
         }
         this.tablasEliminatorias.push(primeraTabla)
     }
-    //Este método enfrenta a los equipos en mismo orden que aparecen en cada uno de los 2 
-    //arrays que componen una tabla eliminatoria (octavos, cuartos, semifinal, etc)
-    //Se enfrentaran 1ºvs2º, 3ºvs4, etc
-    //El ganador de cada partido pasa al array equivalente de la siguiente tabla 
-    //(ej: del array 0 de tablaOctavos al array 0 de cuarto) para que puedan volver a enfrentarse usando el mismo método
+
     /**
-     * Este método recibe una tabla elmininatoría (la primera que recibe será la tabla de octavos de final) y almacena
-     * los resultados de esa eliminatoria en una estructura de arrays igual a la de la propia tabla eliminatora
-     * 
-     * 
-     * 
+     *  Este método enfrenta a los equipos en mismo orden que aparecen en cada uno de los 2 arrays que componen una 
+     *  tabla eliminatoria (octavos, cuartos, semifinal, etc) .Se enfrentaran 1ºvs2º, 3ºvs4, etc
+     *  El método recibe una tabla elmininatoría (la primera que recibe será la tabla de octavos de final) y almacena
+     * los resultados de esa eliminatoria en una estructura de arrays (resultadosTablaEliminatoriaActual)
+     * igual a la de la propia tabla eliminatora . 
+     * El ganador de cada partido pasa al array equivalente de la siguiente tabla eliminatoria (siguienteTablaEliminatoria)
+     * ej: del array 0 de tabla de octavos al array 0 de tabla de cuartos) para que puedan volver a 
+     * enfrentarse usando el mismo método de manera recursiva 
      */
     resolverTablaEliminatoria(tablaEliminatoria) {
         const resultadosTablaEliminatoriaActual = [[], []];
@@ -69,74 +64,60 @@ export default class PlayOff {
             let i = 0
             for (let team = 0; team < group.length; team = team + 2) {
                 let nextTeam = team + 1;
-                console.log(`GRUPO ${groupNumber} - partido ${i + 1}`)
-                console.log(`equipo 1 ${group[team]} - equipo 2 ${group[nextTeam]}`)
                 this.jugarPartido(siguienteTablaEliminatoria, resultadosTablaEliminatoriaActual, group[team], group[nextTeam], groupNumber)
                 i++;
             }
             i = 0;
         })
-        console.log('LONGITUD TABLA ', this.tablasEliminatorias.length)
         this.tablasEliminatorias.push(siguienteTablaEliminatoria)
         this.tablasResultados.push(resultadosTablaEliminatoriaActual)
-        console.log('LONGITUD TABLA ', this.tablasEliminatorias.length)
+        // Despues de la semifinal recuperamos a los equipos que han perdido y los cruzamos en un mismo array
+        //para el tercer y cuarto puesto
+        //Cruzamos a un mismo array los equipos que juegan la final
+        //Así, seguimos manteniendo la estructura de una tabla eliminatoria cons dos array cuyos elementos son rivales
+        //Y podemos seguir aplicando el método recursivamente para jugar el bronce y la final
         if (this.tablasEliminatorias.length == 4) {
-            console.log('PRUEBA 1 ', this.tablasEliminatorias[3])
-
-            //this.tablasEliminatorias[3][0].push(this.tablasEliminatorias[3][1][0])
-
             this.tablasEliminatorias[3][1].push(this.tablasEliminatorias[3][0][0])
             this.tablasEliminatorias[3][0].shift()
             this.tablasEliminatorias[3][0].push(this.partidoBronce[0])
             this.tablasEliminatorias[3][0].push(this.partidoBronce[1])
-            console.log('PRUEBA 2 ', this.tablasEliminatorias[3])
         }
+        //Ejecuta el método recursivamente sobra la nueva eliminatoria generada 5 veces (la última juega la final)
         while (this.tablasEliminatorias.length < 5) {
             this.resolverTablaEliminatoria(siguienteTablaEliminatoria)
         }
-
-
-
-
     }
 
+    //Recibe los dos arrays bidimensionales vacíos (siguienteTablaEliminatoria, resultadosTablaEliminatoriaActual)
+    // generados en resolverTablaEliminatoria()
+    //Recibe los dos primeros equipos de cada uno de los dos arrays que forman tabla eliminatoria actual que recibe el 
+    //método resolverTablaEliminatoria()
+    //arrayNumerInTable representa el indice de cada uno de los dos arrays que forman una tabla eliminatoria
+    //El método genera los goles de cada equipo y guarda al ganador en la siguiente tabla eliminatoria
+    //Tambien guarda los resultados de cada partido en una tabla de resultados con la misma estructura de arrays que 
+    //las tablas eliminatorias
     jugarPartido(siguienteTablaEliminatoria, resultadosTablaEliminatoriaActual, teamA, teamB, arrayNumberInTable) {
-
         const homeGoals = generateGoals()
         const awayGoals = generateGoals()
-        //console.log('GRUPO   ', arrayNumberInTable)
-        //console.log('CHECK   ', this.tablaCuartos[arrayNumberInTable])
         if (homeGoals == awayGoals) {
             this.jugarPartido(siguienteTablaEliminatoria, resultadosTablaEliminatoriaActual, teamA, teamB, arrayNumberInTable)
         } else if (homeGoals > awayGoals) {
+            //Si es semifinal, guarda al perdedor en la tabla partidoBronce para cruzarlo despues con el otro perdedor de la semifinal
             if (this.tablasEliminatorias.length == 3) {
                 this.partidoBronce.push(teamB)
-                console.log('GANA ', teamA)
-                console.log('BRONCE ', teamB)
             }
             siguienteTablaEliminatoria[arrayNumberInTable].push(teamA)
             resultadosTablaEliminatoriaActual[arrayNumberInTable].push(homeGoals)
             resultadosTablaEliminatoriaActual[arrayNumberInTable].push(awayGoals)
-
-
         } else if (homeGoals < awayGoals) {
+            //Si es semifinal, guarda al perdedor en la tabla partidoBronce para cruzarlo despues con el otro perdedor de la semifinal
             if (this.tablasEliminatorias.length == 3) {
                 this.partidoBronce.push(teamA)
-                console.log('GANA ', teamB)
-                console.log('BRONCE ', teamA)
             }
             siguienteTablaEliminatoria[arrayNumberInTable].push(teamB)
             resultadosTablaEliminatoriaActual[arrayNumberInTable].push(homeGoals)
             resultadosTablaEliminatoriaActual[arrayNumberInTable].push(awayGoals)
         }
-
-    }
-
-    ay() {
-        this.tablasEliminatorias.forEach(eliminatoria => {
-            this.resolverTablaEliminatoria(eliminatoria)
-            console.log(eliminatoria)
-        })
     }
 }
 

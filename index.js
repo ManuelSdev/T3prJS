@@ -1,11 +1,7 @@
-
-
-
 import { teamList } from './teams.js'
 import { shuffle } from './utils.js'
 import Classification from './classes/Classification.js'
 import PlayOff from './classes/PlayOff.js'
-
 
 const teams = pickTeams(teamList, 64)
 const configTeams =
@@ -19,12 +15,8 @@ const configTeams =
     position: 0
 }
 
-
-
-
 //Método que recibe un array de equipos y un número de equipos a seleccionar
 //Los equipos del array recibido se mezclan y la cantidad seleccionada de es copiada y devuelta en el array "picked"
-//C
 function pickTeams(teamList, number) {
     const shuffled = shuffle(teamList)
     const picked = []
@@ -41,33 +33,14 @@ function setupTeams(teams) {
     })
 }
 
-
 setupTeams(teams)
-console.table(teams, ['code', 'name'])
-//console.log(teamList)
-
-const pintado = [
-    '-------             -------',
-    '       | --------- |',
-    '-------'
-]
-function pintar(array) {
-    array.forEach(elemento => {
-        console.log(elemento)
-    })
-}
-
-pintar(pintado)
-
+//console.table(teams, ['code', 'name'])
 const classificationStage = new Classification(teams);
 classificationStage.start()
-
 const groups = classificationStage.teamsGroups
 const groupsNames = classificationStage.groupsNames
 const tablesOfGroups = classificationStage.tablesOfGroups
 const tablesOfResults = classificationStage.tablesOfResults
-
-
 
 //tablesOfGroups contiene 8 arrays con las 8 tablas , una por grupo
 //Cada tabla de grupo contiene 3 rondas
@@ -93,20 +66,11 @@ const printGroupsInfo = function () {
                 const awayTeam = tablesOfGroups[i][j][k][1].name
                 console.log(`${hometeam} VS ${awayTeam}`)
             }
-            /*
-            tablesOfGroups[i][j].forEach(match =>{
-                const hometeam = match[0].name
-                const awayTeam = match[1].name
-                console.log(`${hometeam} VS ${awayTeam}`)
-            })
-            */
             console.log('')
         }
     }
 }
 //TODO: empieza mundial
-//Quita position de las tablas y explica el asunto
-//Limpia un poco esta pocilga
 const startClassification = function () {
     //Cada tabla de grupo tiene 3 rondas/arrays
     for (let e = 0; e < 3; e++) {
@@ -131,68 +95,58 @@ const startClassification = function () {
             //En cada jornada/ronda imprimimos el resumen de la ronda actual e del grupo actual i
             const sortedTeams = classificationStage.summaries[e][i].sort(function (a, b) {
                 return b.position - a.position || b.points - a.points || b.goalsDiff - a.goalsDiff
-
             })
             console.table(sortedTeams, ['name', 'points', 'goalsScored', 'goalsConceded', 'goalsDiff', 'position'])
             console.log('')
         }
     }
-
-
 }
 
-printGroupsInfo()
-startClassification()
-
-const playOffsStage = new PlayOff(classificationStage.summaries[2]);
-
-
-//const tablaOctavos = playOffsStage.arrangeClasificatedTeamsInTwoGroups()
-
-//console.log(tablaOctavos)
-const tablasEliminatorias = playOffsStage.getTablas();
-const tablasResultados = playOffsStage.getResultados()
-console.log(tablasEliminatorias)
-console.log(tablasResultados)
-console.log(playOffsStage.partidoBronce)
-//console.log(playOffsStage.tablasEliminatorias[3])
-console.log('==================================================\n====== COMIENZO DE LA FASE DE ELIMINATORIAS ======\n================================================== ')
-//console.log('===== OCTAVOS DE FINAL =====')
-
-for (let e = 0; e < tablasEliminatorias.length - 1; e++) {
-    if (e == 0) {
-        console.log('===== OCTAVOS DE FINAL =====')
-    }
-    if (e == 1) {
-        console.log('===== CUARTOS DE FINAL =====')
-    }
-    if (e == 2) {
-        console.log('===== SEMIFINALES =====')
-    }
-    if (e == 3) {
-        console.log('===== TERCER Y CUARTO PUESTO =====')
-    }
-
-    for (let i = 0; i < tablasEliminatorias[e].length; i++) {
-        if (e == 3 && i == 1) {
-            console.log('===== FINAL =====')
+const extraerYpintarDatosDePlayOff = function () {
+    const tablasEliminatorias = playOffsStage.getTablas();
+    const tablasResultados = playOffsStage.getResultados()
+    console.log('==================================================\n====== COMIENZO DE LA FASE DE ELIMINATORIAS ======\n================================================== ')
+    for (let e = 0; e < tablasEliminatorias.length - 1; e++) {
+        if (e == 0) {
+            console.log('\n===== OCTAVOS DE FINAL =====')
         }
-        for (let a = 0; a < tablasEliminatorias[e][i].length; a = a + 2) {
-            //console.log(tablasEliminatorias[e][i][a])
-
-            const hometeam = tablasEliminatorias[e][i][a]
-            const awayTeam = tablasEliminatorias[e][i][a + 1]
-            const homeGoals = tablasResultados[e][i][a]
-            const awayGoals = tablasResultados[e][i][a + 1]
-            console.log(`${hometeam} ${homeGoals} - ${awayGoals} ${awayTeam} => ${homeGoals > awayGoals ? hometeam : awayTeam}`)
+        if (e == 1) {
+            console.log('\n===== CUARTOS DE FINAL =====')
+        }
+        if (e == 2) {
+            console.log('\n===== SEMIFINALES =====')
+        }
+        if (e == 3) {
+            console.log('\n===== TERCER Y CUARTO PUESTO =====')
+        }
+        for (let i = 0; i < tablasEliminatorias[e].length; i++) {
             if (e == 3 && i == 1) {
-                console.log('================================')
-                console.log(`${homeGoals > awayGoals ? hometeam : awayTeam} campeón del mundo!!!`)
-                console.log('================================')
+                console.log('\n===== FINAL =====')
+            }
+            //Los arrays tablasEliminatorias y tablasResultados tienen la misma estructura y su orden
+            //se corresponde a los  partidos y a los goles de cada equpipo
+            //Recorremos ambos arrays a la vez, usando los mismos índices, para extraer y pintar los datos
+            for (let a = 0; a < tablasEliminatorias[e][i].length; a = a + 2) {
+                const hometeam = tablasEliminatorias[e][i][a]
+                const awayTeam = tablasEliminatorias[e][i][a + 1]
+                const homeGoals = tablasResultados[e][i][a]
+                const awayGoals = tablasResultados[e][i][a + 1]
+                console.log(`${hometeam} ${homeGoals} - ${awayGoals} ${awayTeam} => ${homeGoals > awayGoals ? hometeam : awayTeam}`)
+                if (e == 3 && i == 1) {
+                    console.log('\n================================')
+                    console.log(`${homeGoals > awayGoals ? hometeam : awayTeam} campeón del mundo!!!`)
+                    console.log('================================')
+                }
             }
         }
     }
-
-
 }
+
+
+printGroupsInfo()
+startClassification()
+const playOffsStage = new PlayOff(classificationStage.summaries[2]);
+extraerYpintarDatosDePlayOff()
+
+
 
